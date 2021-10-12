@@ -11,22 +11,6 @@ from generate_encrypted_keys import read_encrypted_keys_from_file, read_decrypte
 fernet_key = generate_fernet_key() # generate a fernet key
 encrypt_keys(fernet_key) # encrypt the oauth keys with the fernet key
 write_encrypted_keys_to_file() # write the keys to the file (binary)
-encrypted_list = read_encrypted_keys_from_file()
-ENCRYPTED_CONSUMER_KEY = encrypted_list[0].strip(str.encode('\n'))
-ENCRYPTED_CONSUMER_SECRET = encrypted_list[1].strip(str.encode('\n'))
-ENCRYPTED_TOKEN_VALUE = encrypted_list[2].strip(str.encode('\n'))
-ENCRYPTED_TOKEN_SECRET = encrypted_list[3].strip(str.encode('\n'))
-
-print(ENCRYPTED_CONSUMER_KEY)
-print(ENCRYPTED_CONSUMER_SECRET)
-print(ENCRYPTED_TOKEN_VALUE)
-print(ENCRYPTED_TOKEN_SECRET)
-
-print()
-print(fernet_key.decrypt(ENCRYPTED_CONSUMER_KEY))
-print(fernet_key.decrypt(ENCRYPTED_CONSUMER_SECRET))
-print(fernet_key.decrypt(ENCRYPTED_TOKEN_VALUE))
-print(fernet_key.decrypt(ENCRYPTED_TOKEN_SECRET))
 
 
 print()
@@ -41,7 +25,7 @@ print(ENCRYPTED_TOKEN_VALUE)
 print(ENCRYPTED_TOKEN_SECRET)
 
 
-#user_auth = OAuth1(CONSUMER_KEY, CONSUMER_SECRET, TOKEN_VALUE, TOKEN_SECRET)
+# user_auth = OAuth1(CONSUMER_KEY, CONSUMER_SECRET, TOKEN_VALUE, TOKEN_SECRET)
 
 # print(type(user_auth.client_class.get_oauth_signature))
 # print(type(user_auth.client_class.get_oauth_params))
