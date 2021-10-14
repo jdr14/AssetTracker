@@ -1,4 +1,5 @@
-import os, time
+import os
+import time
 import requests
 import oauthlib
 from oauthlib.oauth1 import SIGNATURE_HMAC_SHA1
@@ -6,7 +7,11 @@ import requests_oauthlib
 from requests_oauthlib import OAuth1, OAuth1Session
 from hashlib import sha1
 import hmac
+import pytz
+from datetime import datetime
+import random
 
+# local imports
 from keys import CONSUMER_KEY, CONSUMER_SECRET, TOKEN_VALUE, TOKEN_SECRET
 from generate_encrypted_keys import ENCRYPTED_KEY_FILENAME
 from generate_encrypted_keys import generate_fernet_key, encrypt_keys, write_encrypted_keys_to_file
@@ -29,7 +34,7 @@ ENCRYPTED_TOKEN_SECRET = encrypted_list[3].strip(str.encode('\n'))
 # print(ENCRYPTED_TOKEN_VALUE)
 # print(ENCRYPTED_TOKEN_SECRET)
 
-# print(fernet_key.decrypt(ENCRYPTED_CONSUMER_KEY))
+# print(fernet_key.decrypt(ENCRYPTED_CONSUMER_KEY).decode())
 # print(fernet_key.decrypt(ENCRYPTED_CONSUMER_SECRET))
 # print(fernet_key.decrypt(ENCRYPTED_TOKEN_VALUE))
 # print(fernet_key.decrypt(ENCRYPTED_TOKEN_SECRET))
@@ -44,43 +49,33 @@ ENCRYPTED_TOKEN_SECRET = encrypted_list[3].strip(str.encode('\n'))
 #     # The signature
 #     return hashed.digest().encode("base64").rstrip('\n')
 
+tz = pytz.timezone('America/Los_Angeles')
+print(datetime.fromtimestamp(1463288494, tz).isoformat())
+
 user_auth = OAuth1(
-    client_key=str(fernet_key.decrypt(ENCRYPTED_CONSUMER_KEY)), 
-    client_secret=str(fernet_key.decrypt(ENCRYPTED_CONSUMER_SECRET)), 
-    resource_owner_key=str(fernet_key.decrypt(ENCRYPTED_TOKEN_VALUE)), 
-    resource_owner_secret=str(fernet_key.decrypt(ENCRYPTED_TOKEN_SECRET)),
-    # signature_type='AUTH_HEADER',
+    client_key=fernet_key.decrypt(ENCRYPTED_CONSUMER_KEY).decode(), 
+    client_secret=fernet_key.decrypt(ENCRYPTED_CONSUMER_SECRET).decode(), 
+    resource_owner_key=fernet_key.decrypt(ENCRYPTED_TOKEN_VALUE).decode(), 
+    resource_owner_secret=fernet_key.decrypt(ENCRYPTED_TOKEN_SECRET).decode(),
+    signature_type='AUTH_HEADER',
     signature_method=SIGNATURE_HMAC_SHA1,
-    timestamp=str(time.time()),
-    nonce="34958720109740287889638502958312",
-    encoding="UTF-8"
+    timestamp=str(int(time.time())), # unix time 
+    nonce=str(random.getrandbits(32)), # generate random 32 bit nonce
+    encoding="UTF-8" # encoding must be utf-8
 )
 
 #print(user_auth.client_class.get_oauth_params(user_auth,"GET"))
-#print(user_auth.client_class.register_signature_method())
-#print(user_auth.client_class.sign(user_auth, API_BASE_URL))
-# print(user_auth.client_class.get_oauth_signature(user_auth, ))
+# print(user_auth.client_class.register_signature_method())
+print(user_auth.client_class.sign(user_auth, API_BASE_URL))
+print(user_auth.client_class.get_oauth_signature(user_auth, "GET"))
 
 # response = requests.get(API_BASE_URL, auth=user_auth)
 # print(response)
 # print(response.text)
 #user_auth.fetch_access_token(API_BASE_URL)
 
-response = requests.get(
-    API_BASE_URL, 
-    # params={
-    #     "oauth_version": "1.0", 
-    #     "oauth_consumer_key": str(fernet_key.decrypt(ENCRYPTED_CONSUMER_KEY)),
-    #     "oauth_token": str(fernet_key.decrypt(ENCRYPTED_TOKEN_VALUE)),
-    #     "oauth_timestamp": str(time.time()),
-    #     "oauth_nonce": "3495872010",
-    #     "oauth_signature_method": "HMAC-SHA1",
-    #     "oauth_signature": str(user_auth.client_class.get_oauth_signature(user_auth, "POST"))
-    # }, 
-    auth=user_auth)
-
 # response = requests.get(
-#     "{}/items/part/75192".format(API_BASE_URL),
+#     API_BASE_URL, 
 #     # params={
 #     #     "oauth_version": "1.0", 
 #     #     "oauth_consumer_key": str(fernet_key.decrypt(ENCRYPTED_CONSUMER_KEY)),
@@ -91,6 +86,10 @@ response = requests.get(
 #     #     "oauth_signature": str(user_auth.client_class.get_oauth_signature(user_auth, "POST"))
 #     # }, 
 #     auth=user_auth)
+
+response = requests.get(
+    "{}/items/part/75192".format(API_BASE_URL),
+    auth=user_auth)
 print(response)
 print(response.text)
 
