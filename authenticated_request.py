@@ -2,7 +2,7 @@ import os
 import time
 import requests
 import oauthlib
-from oauthlib.oauth1 import SIGNATURE_HMAC_SHA1
+from oauthlib.oauth1 import SIGNATURE_HMAC_SHA1, SIGNATURE_TYPE_AUTH_HEADER, rfc5849
 import requests_oauthlib
 from requests_oauthlib import OAuth1, OAuth1Session
 from hashlib import sha1
@@ -10,6 +10,8 @@ import hmac
 import pytz
 from datetime import datetime
 import random
+import json
+import inspect
 
 # local imports
 from keys import CONSUMER_KEY, CONSUMER_SECRET, TOKEN_VALUE, TOKEN_SECRET
@@ -29,45 +31,57 @@ ENCRYPTED_CONSUMER_SECRET = encrypted_list[1].strip(str.encode('\n'))
 ENCRYPTED_TOKEN_VALUE = encrypted_list[2].strip(str.encode('\n'))
 ENCRYPTED_TOKEN_SECRET = encrypted_list[3].strip(str.encode('\n'))
 
+# print(dir(oauthlib.oauth1))
+
 # print(ENCRYPTED_CONSUMER_KEY)
 # print(ENCRYPTED_CONSUMER_SECRET)
 # print(ENCRYPTED_TOKEN_VALUE)
 # print(ENCRYPTED_TOKEN_SECRET)
 
 # print(fernet_key.decrypt(ENCRYPTED_CONSUMER_KEY).decode())
-# print(fernet_key.decrypt(ENCRYPTED_CONSUMER_SECRET))
-# print(fernet_key.decrypt(ENCRYPTED_TOKEN_VALUE))
-# print(fernet_key.decrypt(ENCRYPTED_TOKEN_SECRET))
+# print(fernet_key.decrypt(ENCRYPTED_CONSUMER_SECRET).decode())
+# print(fernet_key.decrypt(ENCRYPTED_TOKEN_VALUE).decode())
+# print(fernet_key.decrypt(ENCRYPTED_TOKEN_SECRET).decode())
 
+# tz = pytz.timezone('America/Los_Angeles')
+# print(datetime.fromtimestamp(1463288494, tz).isoformat())
 
-# def sign_request():
-#     # key = b"CONSUMER_SECRET&" #If you dont have a token yet
-#     key = b"CONSUMER_SECRET&TOKEN_SECRET" 
-#     # The Base String as specified here: 
-#     raw = b"BASE_STRING" # as specified by OAuth
-#     hashed = hmac.new(key, raw, sha1)
-#     # The signature
-#     return hashed.digest().encode("base64").rstrip('\n')
+url = API_BASE_URL
 
-tz = pytz.timezone('America/Los_Angeles')
-print(datetime.fromtimestamp(1463288494, tz).isoformat())
+# from oauth import OAuthRequest
+# from oauth.signature_method.hmac_sha1 import OAuthSignatureMethod_HMAC_SHA1
+# # params = {
+# #     'oauth_nonce': str(random.getrandbits(32)),
+# #     'oauth_timestamp': str(int(time.time()))
+# #     'oauth_consumer_key': str(fernet_key.decrypt(ENCRYPTED_CONSUMER_KEY).decode()),
+# #     'oauth_signature_method': SIGNATURE_HMAC_SHA1,
+# #     'oauth_version': '1.0',
+# #     'oauth_signature':
+# # }
+# consumer = {
+#     'oauth_token': str(fernet_key.decrypt(ENCRYPTED_TOKEN_VALUE).decode()),
+#     'oauth_token_secret': str(fernet_key.decrypt(ENCRYPTED_TOKEN_SECRET).decode())
+# }
+# request = OAuthRequest(url)
+# request.sign_request(OAuthSignatureMethod_HMAC_SHA1, consumer)
+# header = request.to_header()
 
-user_auth = OAuth1(
-    client_key=fernet_key.decrypt(ENCRYPTED_CONSUMER_KEY).decode(), 
-    client_secret=fernet_key.decrypt(ENCRYPTED_CONSUMER_SECRET).decode(), 
-    resource_owner_key=fernet_key.decrypt(ENCRYPTED_TOKEN_VALUE).decode(), 
-    resource_owner_secret=fernet_key.decrypt(ENCRYPTED_TOKEN_SECRET).decode(),
-    signature_type='AUTH_HEADER',
-    signature_method=SIGNATURE_HMAC_SHA1,
-    timestamp=str(int(time.time())), # unix time 
-    nonce=str(random.getrandbits(32)), # generate random 32 bit nonce
-    encoding="UTF-8" # encoding must be utf-8
-)
+# user_auth = OAuth1(client_key=str(fernet_key.decrypt(ENCRYPTED_CONSUMER_KEY).decode()))
+# user_auth.client_key            = str(fernet_key.decrypt(ENCRYPTED_CONSUMER_KEY).decode())
+# user_auth.client_secret         = str(fernet_key.decrypt(ENCRYPTED_CONSUMER_SECRET).decode())
+# user_auth.resource_owner_key    = str(fernet_key.decrypt(ENCRYPTED_TOKEN_VALUE).decode())
+# user_auth.resource_owner_secret = str(fernet_key.decrypt(ENCRYPTED_TOKEN_SECRET).decode())
+# user_auth.timestamp             = str(int(time.time())) # unix time 
+# user_auth.nonce                 = str(random.getrandbits(32)) # generate random 32 bit nonce
+# user_auth.encoding              = 'utf-8'
+# user_auth.signature_type        = SIGNATURE_TYPE_AUTH_HEADER
+# user_auth.signature_method      = SIGNATURE_HMAC_SHA1,
+# print(inspect.getfullargspec(OAuth1))
 
-#print(user_auth.client_class.get_oauth_params(user_auth,"GET"))
-# print(user_auth.client_class.register_signature_method())
-print(user_auth.client_class.sign(user_auth, API_BASE_URL))
-print(user_auth.client_class.get_oauth_signature(user_auth, "GET"))
+# print(user_auth.client_class.get_oauth_params(user_auth,"GET"))
+# user_auth.client_class.register_signature_method("sign_request", sign_request)
+# print(user_auth.client_class.sign(user_auth, API_BASE_URL))
+# print(user_auth.client_class.get_oauth_signature(user_auth, "GET"))
 
 # response = requests.get(API_BASE_URL, auth=user_auth)
 # print(response)
@@ -76,7 +90,7 @@ print(user_auth.client_class.get_oauth_signature(user_auth, "GET"))
 
 # response = requests.get(
 #     API_BASE_URL, 
-#     # params={
+#     # params={ 
 #     #     "oauth_version": "1.0", 
 #     #     "oauth_consumer_key": str(fernet_key.decrypt(ENCRYPTED_CONSUMER_KEY)),
 #     #     "oauth_token": str(fernet_key.decrypt(ENCRYPTED_TOKEN_VALUE)),
@@ -87,11 +101,28 @@ print(user_auth.client_class.get_oauth_signature(user_auth, "GET"))
 #     # }, 
 #     auth=user_auth)
 
-response = requests.get(
-    "{}/items/part/75192".format(API_BASE_URL),
-    auth=user_auth)
-print(response)
-print(response.text)
+session = OAuth1Session(
+    client_key            = str(fernet_key.decrypt(ENCRYPTED_CONSUMER_KEY).decode()),
+    client_secret         = str(fernet_key.decrypt(ENCRYPTED_CONSUMER_SECRET).decode()),
+    resource_owner_key    = str(fernet_key.decrypt(ENCRYPTED_TOKEN_VALUE).decode()),
+    resource_owner_secret = str(fernet_key.decrypt(ENCRYPTED_TOKEN_SECRET).decode()),
+)
+url_test = "https://api.bricklink.com/api/store/v1/orders?direction=in"
+# response = session.get("{}/items/part/3001old/price".format(API_BASE_URL))
+response = session.get(url_test)
+if (response.ok == True):
+    json_response = response.json()
+    print(response.text)
+    print(json.dumps(json_response, indent=4, sort_keys=True))
+else:
+    print(str(response.status_code) + " " + response.reason)
+    exit()
+
+# response = requests.get(
+#     "{}/items/part/75192".format(API_BASE_URL),
+#     auth=user_auth)
+# print(response)
+# print(response.text)
 
 
 # TYPE = "SET"
