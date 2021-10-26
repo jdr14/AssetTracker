@@ -3,15 +3,12 @@ import random
 import json
 import sys
 from requests_oauthlib import OAuth1, OAuth1Session
-from PyQt5.QtWidgets import QApplication, QMainWindow
 
 # local imports
 from keys import CONSUMER_KEY, CONSUMER_SECRET, TOKEN_VALUE, TOKEN_SECRET
 from generate_encrypted_keys import ENCRYPTED_KEY_FILENAME
 from generate_encrypted_keys import generate_fernet_key, encrypt_keys, write_encrypted_keys_to_file
 from generate_encrypted_keys import read_encrypted_keys_from_file, read_decrypted_keys_from_file
-
-from gui import Window
 
 API_BASE_URL = "https://api.bricklink.com/api/store/v1"
 
@@ -45,7 +42,7 @@ def main():
         'country_code': 'US',  # United States
         'currency_code': 'USD' # US dollars
     }
-
+    
     set_num = 75255
     item_type = "set"
     request = "{0}/items/{1}/{2}-1/price?{3}={4}&{5}={6}&{7}={8}&{9}={10}".format(
@@ -63,15 +60,6 @@ def main():
         json_response = response.json()
         # print(json.dumps(json_response, indent=4, sort_keys=True))
         print(" Average price = $ {}".format(json_response['data']['avg_price']))
-
-        # GUI
-        app = QApplication(sys.argv)
-        window = Window(
-            window_xywh=(400, 200, 900, 600), 
-            window_title="Lego price tracker",
-            window_icon="mr_gold.png",
-        )
-        sys.exit(app.exec_())
     else:
         print(str(response.status_code) + " " + response.reason)
         exit()
