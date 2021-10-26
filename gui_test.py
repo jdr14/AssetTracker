@@ -12,17 +12,29 @@ def main():
         window_icon="images/mr_gold.png",
     )
 
+    inputBox = InputBox(
+    	input_xywh=(
+    		window.width()  - (window.width() / 10) - 60, 
+            (window.height() / 10), 
+            200, 
+            40
+        ),
+        parent=window
+    )
+
     button = PushButton(
     	button_xywh=(
     		window.width()  - (window.width() / 10), 
-            window.height() - (window.height() / 10), 
+            (window.height() / 10), 
             40, 
             40
         ),
     	button_text="",
     	button_icon="images/google_icons/outline_add_circle_outline_black_24dp.png",
+    	slot_list=[inputBox.getInput],
     	parent=window
     )
+
     sys.exit(app.exec_())
 
 
