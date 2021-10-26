@@ -66,7 +66,11 @@ def main():
 
         # GUI
         app = QApplication(sys.argv)
-        window = Window(window_xywh=(400, 200, 900, 600), window_title="Lego price tracker")
+        window = Window(
+            window_xywh=(400, 200, 900, 600), 
+            window_title="Lego price tracker",
+            window_icon="mr_gold.png",
+        )
         sys.exit(app.exec_())
     else:
         print(str(response.status_code) + " " + response.reason)
