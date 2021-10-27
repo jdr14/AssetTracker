@@ -1,17 +1,17 @@
 import os
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, QLabel, QInputDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, QLabel, QInputDialog, QDialog, QHBoxLayout, QDialogButtonBox
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize, QRect
 from exceptions import *
 
 # with open('data.txt', 'w+') as f:
-#     for item in dir(QMainWindow):
+#     for item in dir(QInputDialog):
 #         f.write("\n{}".format(item))
 
 def _checkCoordinateTuple(tp, desired_length=4):
     return (tp and type(tp) == tuple and len(tp) == desired_length)
 
-class Window(QMainWindow):
+class Window(QWidget):#QMainWindow):
     def __init__(self, window_xywh=None, window_title="", window_icon=None):
         super(Window, self).__init__()
         
@@ -24,7 +24,7 @@ class Window(QMainWindow):
         # Set window icon
         if window_icon and os.path.exists(window_icon):
             self.setWindowIcon(QIcon(window_icon))
-            self.setIconSize(QSize(25, 25))
+            # self.setIconSize(QSize(25, 25))
         
         # Set window title
         self.setWindowTitle(window_title)
@@ -39,6 +39,7 @@ class PushButton(QPushButton):
         self.button_xywh = button_xywh
         self.slot_list = slot_list
         self.parent = parent
+        self.setParent(self.parent)
         self.setup()
         self.show()
 
@@ -59,6 +60,7 @@ class InputBox(QInputDialog):
         super(InputBox, self).__init__(parent=parent)
         self.input_xywh = input_xywh
         self.parent = parent
+        self.setParent(self.parent)
         self.setup()
         self.show()
 
@@ -66,8 +68,25 @@ class InputBox(QInputDialog):
         if _checkCoordinateTuple(self.input_xywh):
             self.setGeometry(QRect(*self.input_xywh))
 
-    def getInput(self) -> None:
-        set_num, success = self.getText(self, 'input dialog', 'enter set number')
+    def recordAdd(self) -> None:
+        value, success = self.getText(self, 'Add Record', 'Enter set ID number')
         if success:
-            print("Set Num entered = {}".format(set_num))
+            print("Adding {}".format(value))
+
+    def recordDelete(self) -> None:
+        value, success = self.getText(self, 'Delete Record', 'Enter set ID number')
+        if success:
+            print("Deleting {}".format(value))
+
+    # def getInput(self) -> None:
+    #     # set_num, success = self.getText(self, 'input dialog', 'enter set number')
+    #     if success:
+    #         print("Set Num entered = {}".format(set_num))
+
+
+# class ButtonBox(QDialogButtonBox):
+#     def __init__(self, slot_accepted, slot_rejected):
+#         super(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, self).__init__()
+#         self.accepted.connect(slot_accepted)
+#         self.rejected.connect(slot_rejected)
 
