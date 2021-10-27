@@ -10,8 +10,6 @@ from gui import *
 # class Record:
 # 	def __init__(id, name, price, quantity):
 
-
-
 def main():
     app = QApplication(sys.argv)
     window = Window(
@@ -29,7 +27,6 @@ def main():
     textEntryID.setFixedWidth(30)
     recordLabel = QLabel("ID")
     recordLabel.setFixedHeight(_label_height)
-    # recordLabel.setFixedWidth(15)
     recordLabel.setAlignment(Qt.AlignCenter)
     recordLabel.setFont(font)
 
@@ -77,48 +74,7 @@ def main():
 
     # Create a scroll view to display the records added in 
     scrollview = QScrollArea()
-
-    # recordLabel_dup = QLabel("ID")
-    # recordLabel_dup.setFixedHeight(_label_height)
-    # recordLabel_dup.setFixedWidth(15)
-    # recordLabel_dup.setAlignment(Qt.AlignCenter)
-    # recordLabel_dup.setFont(font)
-
-    # setNumLabel_dup = QLabel("Set Number")
-    # setNumLabel_dup.setFixedHeight(_label_height)
-    # setNumLabel_dup.setAlignment(Qt.AlignCenter)
-    # setNumLabel_dup.setFont(font)
-
-    # nameLabel_dup = QLabel("Set Name")
-    # nameLabel_dup.setFixedHeight(_label_height)
-    # nameLabel_dup.setAlignment(Qt.AlignCenter)
-    # nameLabel_dup.setFont(font)
-
-    # priceLabel_dup = QLabel("Set Price")
-    # priceLabel_dup.setFixedHeight(_label_height)
-    # priceLabel_dup.setAlignment(Qt.AlignCenter)
-    # priceLabel_dup.setFont(font)
-
-    # quantityLabel_dup = QLabel("Set Quantity")
-    # quantityLabel_dup.setFixedHeight(_label_height)
-    # quantityLabel_dup.setAlignment(Qt.AlignCenter)
-    # quantityLabel_dup.setFont(font)
-
-    # recordHeading = QHBoxLayout()
-    # recordHeading.addWidget(recordLabel_dup)
-    # recordHeading.addWidget(setNumLabel_dup)
-    # recordHeading.addWidget(nameLabel_dup)
-    # recordHeading.addWidget(priceLabel_dup)
-    # recordHeading.addWidget(quantityLabel_dup)
-    # recordHeadingGroupBox = QGroupBox()
-    # recordHeadingGroupBox.setLayout(recordHeading)
-    
-    # scrollview.addWidget(recordHeadingGroupBox)
     scrollview.setStyleSheet("background: tan")
-    # temp = QGroupBox()
-    # l = QVBoxLayout(scrollview)
-    # l.addWidget(recordHeadingGroupBox)
-    # temp.setLayout(l)
 
     # Define a slot to connect to once button is clicked
     def addRecord():
@@ -164,20 +120,9 @@ def main():
     grid = QGridLayout()
     grid.setSpacing(20)
     grid.addWidget(headingGroupBox,   0, 0, 2, 6)
-    # grid.addWidget(textEntryID,       1, 0)
-    # grid.addWidget(setNumLabel,       0, 1) # set num  QLabel
-    # grid.addWidget(textEntrySetNum,   1, 1) # set num  QLineEdit
-    # grid.addWidget(nameLabel,         0, 2) # name     QLabel
-    # grid.addWidget(textEntryName,     1, 2) # name     QLineEdit
-    # grid.addWidget(priceLabel,        0, 3) # price    QLabel
-    # grid.addWidget(textEntryPrice,    1, 3) # price    QLineEdit
-    # grid.addWidget(quantityLabel,     0, 4) # quantity Qlabel
-    # grid.addWidget(textEntryQuantity, 1, 4) # quanitty QLineEdit
     grid.addWidget(addButton, 0, 6)         # add button
     grid.addWidget(deleteButton, 1, 6)      # delete button
-    # grid.addWidget(recordHeadingGroupBox, 2, 0, 1, 6)
     grid.addWidget(scrollview, 3, 0, 10, 7) # scrollview
-    # grid.addWidget(temp, 3, 0, 10, 6) # scrollview
 
     window.setLayout(grid)
 
