@@ -99,6 +99,7 @@ def main():
         ])
         record.setFixedHeight(20)
         svlayout.addWidget(record)
+        scrollview.setAlignment(Qt.AlignTop)
         # scrollview.add
     
     def deleteRecord():
