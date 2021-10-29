@@ -4,13 +4,15 @@ from re import L
 from flask import Flask
 from requests.api import request  
 from flask_restful import reqparse
-from authenticated_request import createSession, getRequest, API_BASE_URL
+# from authenticated_request import createSession, getRequest, API_BASE_URL
 
 from requests_oauthlib import OAuth1, OAuth1Session
 
+from session import Session, API_TYPE
+
 app = Flask(__name__) # name for the Flask app (refer to output)
 
-BRICKLINK_SESSION = createSession()
+bricklink_session = Session(API_TYPE.BRICKLINK) 
 
 
 # Define the index route
@@ -37,14 +39,14 @@ def makeAPIReq():
 
     print("set num: {}".format(set_num))
 
-    bricklink_response = getRequest(BRICKLINK_SESSION, set_num)
-
+    # bricklink_response = getRequest(BRICKLINK_SESSION, set_num)
+    bricklink_response = bricklink_session.getRequest(set_num)
 
 # make bricklink request
     
     if (bricklink_response.ok == True):
         bricklink_response = bricklink_response.json()
-        print(bricklink_response)
+        # print(bricklink_response)
         return " Average price = $ {}".format(bricklink_response['data']['avg_price'])
 
     else:
