@@ -8,7 +8,8 @@ from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtGui import QIcon, QPalette, QFont
 from PyQt5.QtCore import Qt
 from gui import *
-from authenticated_request import createSession, getRequest
+import requests
+# from authenticated_request import createSession, getRequest
 
 # class Record:
 #   def __init__(id, name, price, quantity):
@@ -18,7 +19,7 @@ from authenticated_request import createSession, getRequest
 #         f.write("\n{}".format(item))
 
 def main():
-    session = createSession()
+    # session = createSession()
 
     app = QApplication(sys.argv)
     window = Window(
@@ -99,8 +100,10 @@ def main():
         )))
         
         # Get response from session get request and extract the average price
-        response = getRequest(session, textEntrySetNum.text())
-        json_response = response.json()
+        # response = #getRequest(session, textEntrySetNum.text())
+        data = requests.get("http://localhost:5000/API/bricklink?set={}".format(textEntrySetNum.text()))
+        print(data)
+        json_response = data.json()
         avg_price = json_response['data']['avg_price']
 
         record = QTableWidget(0,6)
@@ -115,6 +118,7 @@ def main():
             textEntryPrice.text(), 
             textEntryQuantity.text(),
             "Value = ${}".format(str(float(avg_price) * int(textEntryQuantity.text())))
+            # str(data)
         ])
         record.horizontalHeader().setStretchLastSection(True)
         svlayout.addWidget(record)
