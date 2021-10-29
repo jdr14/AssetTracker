@@ -47,7 +47,7 @@ def makeAPIReq():
     if (bricklink_response.ok == True):
         bricklink_response = bricklink_response.json()
         # print(bricklink_response)
-        return " Average price = $ {}".format(bricklink_response['data']['avg_price'])
+        return bricklink_response #" Average price = $ {}".format(bricklink_response['data']['avg_price'])
 
     else:
         print(str(bricklink_response.status_code) + " " + bricklink_response.reason)
@@ -59,6 +59,7 @@ def makeAPIReq():
 
     
     # respond to client
+    # http://localhost:5000/API/bricklink?set=75255
     
     
 
