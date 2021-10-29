@@ -1,23 +1,32 @@
 import sys
+import json
 from copy import deepcopy
 from PyQt5.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QDialogButtonBox
 from PyQt5.QtWidgets import QLineEdit, QVBoxLayout, QLabel, QGridLayout, QPushButton
-from PyQt5.QtWidgets import QScrollArea, QSizePolicy, QGroupBox, QTableWidget
+from PyQt5.QtWidgets import QScrollArea, QSizePolicy, QGroupBox, QTableWidget, QHeaderView
+from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtGui import QIcon, QPalette, QFont
 from PyQt5.QtCore import Qt
 from gui import *
+from authenticated_request import createSession, getRequest
 
 # class Record:
 #   def __init__(id, name, price, quantity):
 
+# with open('data.txt', 'w+') as f:
+#     for item in dir(QTableWidget):
+#         f.write("\n{}".format(item))
+
 def main():
+    session = createSession()
+
     app = QApplication(sys.argv)
     window = Window(
-        window_xywh=(400, 200, 600, 500), 
+        window_xywh=(400, 200, 700, 500), 
         window_title="Lego price tracker",
         window_icon="images/mr_gold.png",
     )
-    
+
     font = QFont()
     font.setBold(True)
 
@@ -88,19 +97,28 @@ def main():
             textEntryPrice.text(), 
             textEntryQuantity.text()
         )))
-        record = QTableWidget(0,5)
+        
+        # Get response from session get request and extract the average price
+        response = getRequest(session, textEntrySetNum.text())
+        json_response = response.json()
+        avg_price = json_response['data']['avg_price']
+
+        record = QTableWidget(0,6)
         record.setShowGrid(False)
+        record.setRowCount(0)
+        
+        # record.resizeColumnsToContents()
         record.setHorizontalHeaderLabels([
             textEntryID.text(),
             textEntrySetNum.text(), 
             textEntryName.text(), 
             textEntryPrice.text(), 
-            textEntryQuantity.text()
+            textEntryQuantity.text(),
+            "Value = ${}".format(str(float(avg_price) * int(textEntryQuantity.text())))
         ])
-        record.setFixedHeight(20)
+        record.horizontalHeader().setStretchLastSection(True)
         svlayout.addWidget(record)
         scrollview.setAlignment(Qt.AlignTop)
-        # scrollview.add
     
     def deleteRecord():
         print("Delete record")
@@ -125,7 +143,7 @@ def main():
     grid.addWidget(headingGroupBox,   0, 0, 2, 6)
     grid.addWidget(addButton, 0, 6)         # add button
     grid.addWidget(deleteButton, 1, 6)      # delete button
-    grid.addWidget(scrollview, 3, 0, 10, 7) # scrollview
+    grid.addWidget(scrollview, 3, 0, 10, 8) # scrollview
 
     window.setLayout(grid)
 
