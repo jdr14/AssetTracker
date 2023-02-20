@@ -64,7 +64,7 @@ class Session(URLS):
         except Exception as err:
             raise err
 
-    def getRequest(self, item_num, item_type="set", guide_type="sold", new_or_used="N", country_code="US", currency_code="USD"):
+    def getAvgPriceRequest(self, item_num, item_type="set", guide_type="sold", new_or_used="N", country_code="US", currency_code="USD"):
         _request = "{0}/items/{1}/{2}-1/price?{3}={4}&{5}={6}&{7}={8}&{9}={10}".format(
             self.bricklink_base_url,
             item_type,
@@ -76,7 +76,13 @@ class Session(URLS):
         )
         return self.session.get(_request)
 
-
+    def getSetNameRequest(self, item_num, item_type="set"):
+        _request = "{0}/items/{1}/{2}-1?country_code=US".format(
+            self.bricklink_base_url,
+            item_type,
+            item_num
+        )
+        return self.session.get(_request)
 
 
 
